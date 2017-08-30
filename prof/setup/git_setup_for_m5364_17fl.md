@@ -1,7 +1,7 @@
 The main shared repo at https://github.com/Tarleton-Math/M5364_17fl_Data_Mining1.git will be public so everyone can view it.  You will create your own private repo that can sync changes from the shared.  You repo needs to be private so others can't see your homework solutions.  Here's how we do that:
 
 Plan
-- Folder "prof" common to everyone.  I will primarily manage this part to distribute course materials like homework, links, instructions, etc.  But I encourage you to add to the "prof/resources/links.md" file as you find helpful resources.
+- Folder "prof" is common to everyone.  I will primarily use this to distribute course materials like homework, links, instructions, etc.  But I encourage you to add to "prof/resources/links.md" as you find helpful resources.
 - Folder "student" is for you individually.  Nothing goes into here in the shared repo.  You will submit your hwk to your own repo in this folder for me to grade.
 
 Instructions
