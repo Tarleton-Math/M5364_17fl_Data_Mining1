@@ -10,4 +10,3 @@ name - github user id
 - Jocelyn Correa - ???
 - Pedro Romero - PRomero84
 - William Sumpter - ???
-- 
