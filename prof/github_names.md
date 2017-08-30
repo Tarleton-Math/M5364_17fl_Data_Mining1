@@ -1,6 +1,13 @@
 name - github user id
-- scott cook - drscook
+- Scott Cook - drscook
 - Tu Nguyen - tanguyen17
 - Jurgen Xhafaj - jurgenxhafaj
 - Ed Smith - lordthinktank
-- taylor hutyra - taylor-hutyra
+- Taylor Hutyra - taylor-hutyra
+- Clayon Boone - ???
+- James Young - ???
+- Janine Prukop - GirlyMathNerd
+- Jocelyn Correa - ???
+- Pedro Romero - PRomero84
+- William Sumpter - ???
+- 
