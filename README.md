@@ -2,7 +2,7 @@
 
 This repo contains source files for Math 5364 - Data Mining for Fall 2017 at Tarleton State University.
 
-- Folder "prof" common to everyone.  I will primarily use this distribute course materials like homework, links, instructions, etc.  But I encourage you to add to "prof/resources/links.md" as you find helpful resources.
+- Folder "prof" is common to everyone.  I will primarily use this distribute course materials like homework, links, instructions, etc.  But I encourage you to add to "prof/resources/links.md" as you find helpful resources.
 - Folder "student" is for you individually.  Nothing goes into here in the shared repo.  You will submit your hwk to your own repo in this folder for me to grade.
 
 Test if MathJax is rendering properly
