@@ -4,8 +4,11 @@ My GitHub repo will be public so everyone can view it.  But your clone needs to 
 - Confirm from link in your email to join Tarleton-Math.
 - Create new *private* repo under Tarleton-Math organization name m5364_17fl_Data_Mining_yourlastname
 - Setup your repo to stay in sync with the share.  Instructions modified from  https://medium.com/@bilalbayasut/github-how-to-make-a-fork-of-public-repository-private-6ee8cacaf9d3
+
 -- "shared_url" = share repo, https://github.com/Tarleton-Math/M5364_17fl_Data_Mining1.git (I'm using the word shared where the article uses public.)
+
 -- "private_url" = your personal repo (click green "clone or download button)
+
 -- Determine where on your local hard you want stuff to live.  Open a shell and naviagte.  (In windows, you can right click choose "open git bash here".)
 -- git clone --bare "shared_url" (creates temporary folder)
 -- cd into the dir it just made
