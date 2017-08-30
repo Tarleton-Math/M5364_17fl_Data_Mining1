@@ -22,3 +22,4 @@ who added - link
 - Cook - https://gist.github.com/glamp/74188691c91d52770807
 - Cook - https://medium.com/towards-data-science/using-docker-to-set-up-a-deep-learning-environment-on-aws-6af37a78c551
 - Cook - https://developer.basespace.illumina.com/docs/content/documentation/native-apps/manage-docker-image
+- Editing
