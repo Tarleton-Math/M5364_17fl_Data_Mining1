@@ -8,6 +8,7 @@ who added - link
 ##### Git & GitHub
 - Cook - https://git-scm.com/docs/gittutorial
 - Cook - https://try.github.io/levels/1/challenges/1
+- Cook - https://medium.com/@bilalbayasut/github-how-to-make-a-fork-of-public-repository-private-6ee8cacaf9d3
 
 ##### Learn Python 
 - Cook - https://github.com/jakevdp/WhirlwindTourOfPython
