@@ -1,6 +1,7 @@
 who added - link
 
 ##### Python/Jupyter Setup
+- Cook - https://www.anaconda.com/download/
 - Cook -  https://chrisalbon.com/jupyter/run_project_jupyter_on_amazon_ec2.html
 - https://askubuntu.com/questions/196768/how-to-install-updates-via-command-line
 
