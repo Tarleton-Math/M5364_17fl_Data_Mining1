@@ -9,4 +9,4 @@ name - github user id
 - Janine Prukop - GirlyMathNerd
 - Jocelyn Correa - ???
 - Pedro Romero - PRomero84
-- William Sumpter - ???
+- William Sumpter - JarredSumpter
