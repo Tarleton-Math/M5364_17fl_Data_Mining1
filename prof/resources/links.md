@@ -6,7 +6,7 @@ who added - link
 - https://askubuntu.com/questions/196768/how-to-install-updates-via-command-line
 
 ##### Git & GitHub
-- Cook _ https://git-scm.com/download/win
+- Cook - https://git-scm.com/download/win
 - Cook - https://git-scm.com/docs/gittutorial
 - Cook - https://try.github.io/levels/1/challenges/1
 - Cook - https://medium.com/@bilalbayasut/github-how-to-make-a-fork-of-public-repository-private-6ee8cacaf9d3
