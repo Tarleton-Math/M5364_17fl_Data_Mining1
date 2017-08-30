@@ -4,7 +4,7 @@ name - github user id
 - Jurgen Xhafaj - jurgenxhafaj
 - Ed Smith - lordthinktank
 - Taylor Hutyra - taylor-hutyra
-- Clayon Boone - ???
+- Clayon Boone - cboone25
 - James Young - ???
 - Janine Prukop - GirlyMathNerd
 - Jocelyn Correa - ???
