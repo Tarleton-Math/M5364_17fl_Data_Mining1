@@ -17,7 +17,7 @@ Instructions
 	1. git push --mirror "private_url"
 	1. cd ..
 	1. rm -rf "temporary folder"
-	1. git clone "shared_url"
+	1. git clone "private_url"
 	1. git remote add shared "shared_url"
 	- Hurray, you now have your private repo with a copy of the shared repo both in the cloud and on your local machine.  It has the shared repo as a "remote" called shared.
 
