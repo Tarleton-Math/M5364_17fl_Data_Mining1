@@ -34,3 +34,6 @@ kdnuggets is a very useful online resources that get update on a regular basis. 
 
 https://www.youtube.com/watch?v=l6oKriR-RjM - The Joy of Data - BBC Documentary.
 This is a wonderful documentary that links math and data science. It is very inspirational. You guys should check it out.  - Tu Nguyen
+
+https://pandas.pydata.org/pandas-docs/stable/10min.html#min - 10 Minutes to pandas.
+If you guys need help understanding the core concept of pandas package, this is a good quick tutorial to start. Note that, Pandas is used a lot in data science. - Tu Nguyen
