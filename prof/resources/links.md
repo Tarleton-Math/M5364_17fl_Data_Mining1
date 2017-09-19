@@ -1,3 +1,4 @@
+.
 who added - link
 
 ##### Python/Jupyter Setup
@@ -28,8 +29,8 @@ who added - link
 #### Useful links
 
 
-http://www.kdnuggets.com/2017/06/7-steps-mastering-data-preparation-python.html - Tu nguyen
-kdnuggets is a very useful online resources that get update on a regular basis. You guys should check it out and may be subcribe to it.
+http://www.kdnuggets.com/2017/06/7-steps-mastering-data-preparation-python.html 
+kdnuggets is a very useful online resources that get update on a regular basis. You guys should check it out and may be subcribe to it. - Tu nguyen
 
-https://www.youtube.com/watch?v=l6oKriR-RjM - The Joy of Data - BBC Documentary - Tu Nguyen
-This is a wonderful documentary that links math and data science. It is very inspirational. You guys should check it out. 
+https://www.youtube.com/watch?v=l6oKriR-RjM - The Joy of Data - BBC Documentary.
+This is a wonderful documentary that links math and data science. It is very inspirational. You guys should check it out.  - Tu Nguyen
