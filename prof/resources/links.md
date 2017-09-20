@@ -25,6 +25,10 @@ who added - link
 - Cook - https://medium.com/towards-data-science/using-docker-to-set-up-a-deep-learning-environment-on-aws-6af37a78c551
 - Cook - https://developer.basespace.illumina.com/docs/content/documentation/native-apps/manage-docker-image
 
+##### Regex
+- Rowe - https://regexone.com/problem/matching_filenames?
+- Rowe - https://regexr.com/
+
 
 #### Useful links
 
