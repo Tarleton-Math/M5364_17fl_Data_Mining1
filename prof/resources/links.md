@@ -17,6 +17,7 @@ who added - link
 - Cook - http://www.acsu.buffalo.edu/~adamcunn/spring2017/_downloads/MTH337ClassnotesSpring2017.pdf
 
 ##### Data Science
+- Cook - http://scikit-learn.org/stable/tutorial/machine_learning_map/
 - Cook - https://github.com/jakevdp/PythonDataScienceHandbook
 - Cook - https://web.stanford.edu/~hastie/ElemStatLearn
 - Cook - https://www.analyticsvidhya.com/blog/2017/02/top-28-cheat-sheets-for-machine-learning-data-science-probability-sql-big-data/  - a bunch of cheat sheets that could be very handy indeed
