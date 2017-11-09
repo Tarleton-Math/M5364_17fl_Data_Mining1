@@ -19,6 +19,9 @@ who added - link
 ##### Data Science
 - Cook - https://github.com/jakevdp/PythonDataScienceHandbook
 - Cook - https://web.stanford.edu/~hastie/ElemStatLearn
+- Cook - https://www.analyticsvidhya.com/blog/2017/02/top-28-cheat-sheets-for-machine-learning-data-science-probability-sql-big-data/  - a bunch of cheat sheets that could be very handy indeed
+- Cook - http://scikit-learn.org/stable/modules/classes.html
+- Cook - https://www.kdnuggets.com/2017/10/top-10-machine-learning-algorithms-beginners.html
 
 ##### Docker
 - Cook - https://gist.github.com/glamp/74188691c91d52770807
