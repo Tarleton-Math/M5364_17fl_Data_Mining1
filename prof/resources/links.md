@@ -23,6 +23,7 @@ who added - link
 - Cook - https://www.analyticsvidhya.com/blog/2017/02/top-28-cheat-sheets-for-machine-learning-data-science-probability-sql-big-data/  - a bunch of cheat sheets that could be very handy indeed
 - Cook - http://scikit-learn.org/stable/modules/classes.html
 - Cook - https://www.kdnuggets.com/2017/10/top-10-machine-learning-algorithms-beginners.html
+- Cook - k-modes paper - http://citeseerx.ist.psu.edu/viewdoc/download?doi=10.1.1.15.4028&rep=rep1&type=pdf
 
 ##### Docker
 - Cook - https://gist.github.com/glamp/74188691c91d52770807
