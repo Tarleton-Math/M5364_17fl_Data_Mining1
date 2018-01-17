@@ -25,6 +25,10 @@ who added - link
 - Cook - https://www.kdnuggets.com/2017/10/top-10-machine-learning-algorithms-beginners.html
 - Cook - k-modes paper - http://citeseerx.ist.psu.edu/viewdoc/download?doi=10.1.1.15.4028&rep=rep1&type=pdf
 
+
+##### Deep Learning
+- Cook - https://mattmazur.com/2015/03/17/a-step-by-step-backpropagation-example/ - backpropagation worked in detail
+
 ##### Docker
 - Cook - https://gist.github.com/glamp/74188691c91d52770807
 - Cook - https://medium.com/towards-data-science/using-docker-to-set-up-a-deep-learning-environment-on-aws-6af37a78c551
