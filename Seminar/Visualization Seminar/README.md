@@ -6,9 +6,9 @@ Authors: Tu A. Nguyen, James A. Young
 
 Department of Mathematics - Tarleton State University
 
-![](fig0.png)
-![](fig1.png)
-![](fig2.png)
-![](fig3.png)
-![](fig4.png)
-![](fig5.png)
+![](img/fig0.png)
+![](img/fig1.png)
+![](img/fig2.png)
+![](img/fig3.png)
+![](img/fig4.png)
+![](img/fig5.png)
