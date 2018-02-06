@@ -1,3 +1,5 @@
+[![Binder](https://mybinder.org/badge.svg)](https://mybinder.org/v2/gh/Tarleton-Math/M5364_17fl_Data_Mining1/master)
+
 # M5364_17fl_Data_Mining1 & M5366_18sp_Data_Mining2
 
 This repo contains source files for Math 5364 - Data Mining I for Fall 2017 and Math 5366 - Data Mining II for Spring 2018 at Tarleton State University.
