@@ -28,6 +28,8 @@ who added - link
 
 ##### Deep Learning
 - Cook - https://mattmazur.com/2015/03/17/a-step-by-step-backpropagation-example/ - backpropagation worked in detail
+Hutrya - http://parrt.cs.usfca.edu/doc/matrix-calculus/index.html?utm_content=buffera4163&utm_medium=social&utm_source=linkedin.com&utm_campaign=buffer
+
 
 ##### Docker
 - Cook - https://gist.github.com/glamp/74188691c91d52770807
