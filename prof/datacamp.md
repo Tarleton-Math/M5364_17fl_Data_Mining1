@@ -1,0 +1,6 @@
+natural language processing
+network analysis in python I and II
+parallel computing with dask
+interactive data with bokeh
+time series data
+pyspark
