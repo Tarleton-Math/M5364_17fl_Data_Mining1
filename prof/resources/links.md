@@ -1,3 +1,4 @@
+
 .
 who added - link
 
@@ -52,3 +53,6 @@ This is a wonderful documentary that links math and data science. It is very ins
 
 - Tu Nguyen - https://pandas.pydata.org/pandas-docs/stable/10min.html#min - 10 Minutes to pandas.
 If you guys need help understanding the core concept of pandas package, this is a good quick tutorial to start. Note that, Pandas is used a lot in data science. 
+
+- Tu Nguyen - https://www.youtube.com/watch?v=NgUj8DEH5Tc - Network Centrality 
+This is a visually stunning and useful video to understanding the different measuring metrics for analysing networks. 
