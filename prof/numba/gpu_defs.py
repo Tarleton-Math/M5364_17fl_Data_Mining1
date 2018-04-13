@@ -1,7 +1,7 @@
 import math
 import numba as nb
 import numba.cuda as cuda
-nb_dtype = nb.float32
+nb_dtype = nb.float64
 threads_per_block_max = 1024
 sqrt_threads_per_block_max = int(np.floor(np.sqrt(threads_per_block_max)))
 
@@ -44,31 +44,29 @@ def load_gpu(part):
 
     part.radius_gpu = cuda.to_device(part.radius)
 
-#     part.pos_smrt = nb.SmartArray(part.pos, copy=False)
-#     part.pos = part.pos_smrt.get('host')
-
     part.pos_smrt = nb.SmartArray(part.pos)
     part.pos = part.pos_smrt.get('host')
 
     part.vel_smrt = nb.SmartArray(part.vel)
     part.vel = part.vel_smrt.get('host')
 
+    part.pw_mask_smrt = nb.SmartArray(part.pw_mask)
+    part.pw_mask = part.pw_mask_smrt.get('host')
+
     part.pp_mask_smrt = nb.SmartArray(part.pp_mask)
     part.pp_mask = part.pp_mask_smrt.get('host')
     
-    part.pw_mask_smrt = nb.SmartArray(part.pw_mask)
-    part.pw_mask = part.pw_mask_smrt.get('host')
-    
     part.pp_dt_block = np.full([part.num, pp_grid_shape[0]], np.inf, dtype=np_dtype)
     part.pp_dt_block_smrt = nb.SmartArray(part.pp_dt_block)
+    part.pp_dt_block = part.pp_dt_block_smrt.get('host')
 
 #     part.wall_base_point_gpu = cuda.to_device(np.vstack([w.base_point for w in wall]))
 #     part.wall_normal_gpu = cuda.to_device(np.vstack([w.normal for w in wall]))
 #     part.pw_gap_min_gpu = cuda.to_device(np.vstack([w.pw_gap_min for w in wall]))
 
 def sync(cpu, smrt):
-    assert np.allclose(cpu,smrt.get('host'), rtol=0.01)
-    assert np.allclose(cpu,smrt.get('gpu'), rtol=0.01)
+    assert np.allclose(cpu, smrt.get('host'), rtol=rel_tol)
+    assert np.allclose(cpu, smrt.get('gpu'), rtol=rel_tol)
 
 def check_sync():
     sync(part.pos, part.pos_smrt)
@@ -77,18 +75,28 @@ def check_sync():
     sync(part.pp_mask, part.pp_mask_smrt)
 
 def update_gpu(part):
-    part.pos_smrt.mark_changed()
-    part.vel_smrt.mark_changed()
-    part.pw_mask_smrt.mark_changed()
-    part.pp_mask_smrt.mark_changed()
-#     cuda.synchronize()
+    part.pos_smrt.mark_changed('host')
+    part.vel_smrt.mark_changed('host')
+    part.pw_mask_smrt.mark_changed('host')
+    part.pp_mask_smrt.mark_changed('host')
     
 def get_pp_col_time_gpu(part):
+    global errors
     get_pp_col_time_kernel[pp_grid_shape, pp_block_shape](part.pp_dt_block_smrt, part.pos_smrt, part.vel_smrt, part.pp_mask_smrt, part.num, part.radius_gpu)#, part.pp_dt_full_gpu, part.pp_a_gpu, part.pp_b_gpu, part.pp_c_gpu)
-    part.pp_dt_gpu = np.min(part.pp_dt_block_smrt.get('gpu'), axis=1)
-#     cuda.synchronize()
+
+#     part.pp_dt_block_smrt.mark_changed('gpu')
+#     part.pp_dt_gpu = np.min(part.pp_dt_block_smrt.get('gpu'), axis=1)
+
+    part.pp_dt_gpu = part.pp_dt_block_smrt.min(axis=1)
+    
 #     part.get_pp_col_time_cpu()
-#     assert np.allclose(part.pp_dt, part.pp_dt_gpu, rtol=0.01)
+#     if not np.allclose(part.pp_dt, part.pp_dt_gpu, rtol=rel_tol):
+#         print('pp_dt_cpu and pp_dt_gpu do not match')
+#         D = part.pp_dt_gpu - part.pp_dt
+#         idx = np.nanargmax(D)
+#         print('index {} if off by {}'.format(idx,D[idx]))
+#         errors +=1
+#         print('errors = {}'.format(errors))
     part.pp_dt = part.pp_dt_gpu.copy()
 
     
@@ -136,47 +144,51 @@ def get_pp_col_time_kernel(pp_dt, pos, vel,  mask, N, radius):#, pp_dt_full, a_g
 #         c_gpu[p,q] = pos[p,2]
 #         pp_dt_full[p,q] = pp_dt_shr[ty,tx]
 
-        
+    
         
 @cuda.jit(device=True)
 def solve_quadratic_gpu(a, b, c, mask=False):
-    tol = 1e-5
+    # The hard task is finding the first root.  Because the sum and product of the two roots must equal
+    # -b/a and c/a resp, we can compute the second easily.
+    # We use a combination of the Citardauq and the quadratic formulas.  Each is numerically stable for a
+    # different range of coeficients.
+
+    M = 1e8
     small = np.inf
     big = np.inf
-    b *= -1
-    if abs(a) < tol:
-        if abs(b) >= tol:
-            small = c / b
-    else:
-        d = b**2 - 4 * a * c
-        if d >= 0:
-            d = math.sqrt(d)
-            f = 2 * a
-            if b >= 0:
-                small = (b - d) / f
-                big  =  (b + d) / f
-            else:
-                small = (b + d) / f
-                big  =  (b - d) / f
-#     if mask == True:
-#         small = big
-#         big = np.inf
-#     if small < 0:
-#         if big < 0:
-#             small = np.inf
-# #             big = np.inf
-#         else:
-#             small = big
-# #             big = np.inf
-#     return small
+    d = b**2 - 4*a*c
+    if d >= 0:
+        d = math.sqrt(d)        
+        if b < 0:
+            d *= -1
+            
+        e = -(b + d) / 2
+        if abs(c) < M * abs(e):
+            small = c / e
+        else:
+            f = -(b - d) / 2
+            if abs(f) < M * abs(a):
+                small = f / a
+                
+        if abs(b) < M * abs(a):
+            big = - b / a - small
+        else:
+            g = a * small
+            if abs(c) < M * abs(g):
+                big = c / g
 
-    if mask == True:
-        small = np.inf
-    if small < 0:
-        small = np.inf
-    if big < 0:
-        big = np.inf
-    return min(small, big)
+        if mask == True:
+            small = big
+#             big = np.inf
+        if small < 0:
+            if big < 0:
+                small = np.inf                
+            else:
+                small = big
+#             big = np.inf
+#         elif big < 0:
+#             big = np.inf
+    return small
 
 
 

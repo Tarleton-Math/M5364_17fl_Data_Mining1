@@ -8,7 +8,8 @@ import ipywidgets as widgets
 
 ### Global variables
 abs_tol = 1e-5
-np_dtype = np.float32
+rel_tol = 1e-3
+np_dtype = np.float64
 threads_per_block_max = 1024
 sqrt_threads_per_block_max = int(np.floor(np.sqrt(threads_per_block_max)))
 
@@ -22,11 +23,11 @@ def next_state(part):
     part.t += part.dt
     part.pos += part.vel * part.dt
 
-    pw_events = (part.pw_dt - part.dt) < abs_tol
+    pw_events = (part.pw_dt - part.dt) < 1e-7
     pw_counts = contract(pw_events)
     pw_tot = np.sum(pw_counts)
     
-    pp_events = (part.pp_dt - part.dt) < abs_tol
+    pp_events = (part.pp_dt - part.dt) < 1e-7
     pp_counts = contract(pp_events)
     pp_tot = np.sum(pp_counts)
     
@@ -45,7 +46,6 @@ def next_state(part):
         wall[w].resolve_pw_collision(part, p)
     else:
         P = tuple(np.nonzero(pp_counts + pw_counts)[0])
-        
         print('COMPLEX COLLISION DETECTED. Re-randomizing positions of particles {}'.format(P))
         part.pos[P,:] = np.inf
         part.pw_mask[:] = part.default_mask[:]
@@ -114,7 +114,7 @@ class FlatWall(Wall):
         nu = self.normal_static
         c = dx.dot(nu) - part.radius
         c[np.isinf(c)] = np.inf #corrects -np.inf to +np.inf
-        c[np.isnan(c)] = np.inf #corrects -np.inf to +np.inf
+        c[np.isnan(c)] = np.inf #corrects np.nan to +np.inf
         if gap_only == True:
             return c
         dv = part.vel
@@ -240,7 +240,7 @@ class Particles():
             print(self.pw_gap)
             print(self.pp_gap)
             raise Exception('A particle escaped')
-        if abs(1-self.KE_init/self.get_KE()) > abs_tol:
+        if abs(1-self.KE_init/self.get_KE()) > rel_tol:
             raise Exception(' KE not conserved')
         return True
     
@@ -259,22 +259,32 @@ class Particles():
         
         
 def solve_quadratic(a, b, c, mask=[]):
-    tol = 1e-5
+    # The hard task is finding the first root.  Because the sum and product of the two roots must equal
+    # -b/a and c/a resp, we can compute the second easily.
+    # We use a combination of the Citardauq and the quadratic formulas.  Each is numerically stable for a
+    # different range of coeficients.
     small = np.full(a.shape, np.inf)
     big = small.copy()
-    b *= -1    
-    lin = (np.abs(a) < tol) & (np.abs(b) >= tol)  #linear 
-    small[lin] = c[lin] / b[lin]
-    
+    M = 1e8
     d = b**2 - 4*a*c  #discriminant
-    quad = (np.abs(a) >= tol) & (d >= 0)  #quadratic
-    d[quad] = np.sqrt(d[quad])
-    small[quad] = (b[quad] - d[quad]) / (2 * a[quad])
-    big[quad] = (b[quad] + d[quad]) / (2 * a[quad])
+    real = (d >= 0)
+    d[real] = np.sqrt(d[real]) * np.sign(b)[real]
     
-    # We want the solutions ordered small -> big by abs val, so we swap where needed
-    swap = quad & (b < 0)
-    small[swap], big[swap] = big[swap], small[swap]
+    e = -(b + d) / 2
+    citardauq_formula = real & (np.abs(c) < M * np.abs(e))
+    small[citardauq_formula] = c[citardauq_formula] / e[citardauq_formula]
+    
+    f = -(b - d) / 2
+    quadratic_formula = real & ~citardauq_formula & (np.abs(f) < M * np.abs(a))
+    small[quadratic_formula] = f[quadratic_formula] / a[quadratic_formula]
+    
+    s = real & (np.abs(b) < M * np.abs(a))
+    big[s] = -b[s]/a[s] - small[s]
+    
+    with np.errstate(invalid='ignore'):  # suppresses warnings for inf-inf
+        g = a * small
+        m = real & ~s & (np.abs(c) < M * np.abs(g))
+    big[m] = c[m] / g[m]
 
     try:
         small[mask] = big[mask]
@@ -285,7 +295,10 @@ def solve_quadratic(a, b, c, mask=[]):
     small_idx = small < 0
     big_idx = big < 0
     clear_idx = small_idx & big_idx
-    small[clear_idx] = np.inf
+    small[clear_idx] = np.inf    
+    
     swap_idx = small_idx & ~big_idx
     small[swap_idx] = big[swap_idx]
-    return small
+    
+#     big[big_idx] = np.inf
+    return small#, big
