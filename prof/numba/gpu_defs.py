@@ -37,11 +37,19 @@ def disp_gpu(A):
 
 
 def load_gpu(part):
-    print('load_gpu')
-
+    global mode
+    
     if part.num < part.dim:
-        raise Exception('Can not use parallel processing when part_num < dim')
+        print('Can only use parallel processing when {} = part_num  >= dim = {}. Switching to serial.'.format(part.num, part.dim))
+        mode = 'serial'
+        return
 
+    r = part.num % sqrt_threads_per_block_max
+    if r != 0:
+        print('I urge you to set num_part to a multiple of sqrt_threads_per_block_max = {}'.format(sqrt_threads_per_block_max))
+        
+    print('load_gpu')
+    
     part.radius_gpu = cuda.to_device(part.radius)
 
     part.pos_smrt = nb.SmartArray(part.pos)
@@ -64,11 +72,16 @@ def load_gpu(part):
 #     part.wall_normal_gpu = cuda.to_device(np.vstack([w.normal for w in wall]))
 #     part.pw_gap_min_gpu = cuda.to_device(np.vstack([w.pw_gap_min for w in wall]))
 
-def sync(cpu, smrt):
+    update_gpu(part)
+    check_gpu_sync()
+    part.check()
+
+
+def is_synced(cpu, smrt):
     assert np.allclose(cpu, smrt.get('host'), rtol=rel_tol)
     assert np.allclose(cpu, smrt.get('gpu'), rtol=rel_tol)
 
-def check_sync():
+def check_gpu_sync():
     sync(part.pos, part.pos_smrt)
     sync(part.vel, part.vel_smrt)
     sync(part.pw_mask, part.pw_mask_smrt)
@@ -89,15 +102,18 @@ def get_pp_col_time_gpu(part):
 
     part.pp_dt_gpu = part.pp_dt_block_smrt.min(axis=1)
     
-#     part.get_pp_col_time_cpu()
-#     if not np.allclose(part.pp_dt, part.pp_dt_gpu, rtol=rel_tol):
-#         print('pp_dt_cpu and pp_dt_gpu do not match')
-#         D = part.pp_dt_gpu - part.pp_dt
-#         idx = np.nanargmax(D)
-#         print('index {} if off by {}'.format(idx,D[idx]))
-#         errors +=1
-#         print('errors = {}'.format(errors))
-    part.pp_dt = part.pp_dt_gpu.copy()
+    if check_gpu_against_cpu == True:
+#         print('checking against cpu')
+        part.get_pp_col_time_cpu()
+        if not np.allclose(part.pp_dt, part.pp_dt_gpu, rtol=rel_tol):
+            print('pp_dt_cpu and pp_dt_gpu do not match')
+            D = part.pp_dt_gpu - part.pp_dt
+            idx = np.nanargmax(D)
+            print('index {} if off by {}'.format(idx,D[idx]))
+            errors +=1
+            print('errors = {}'.format(errors))
+    else:
+        part.pp_dt = part.pp_dt_gpu.copy()
 
     
 @cuda.jit
