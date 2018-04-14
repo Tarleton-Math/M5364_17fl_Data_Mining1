@@ -2,8 +2,6 @@ import math
 import numba as nb
 import numba.cuda as cuda
 nb_dtype = nb.float64
-threads_per_block_max = 1024
-sqrt_threads_per_block_max = int(np.floor(np.sqrt(threads_per_block_max)))
 
 num_walls = len(wall)
 num_part = part.num
@@ -74,7 +72,7 @@ def load_gpu(part):
 
     update_gpu(part)
     check_gpu_sync()
-    part.check()
+    
 
 
 def is_synced(cpu, smrt):
@@ -82,10 +80,10 @@ def is_synced(cpu, smrt):
     assert np.allclose(cpu, smrt.get('gpu'), rtol=rel_tol)
 
 def check_gpu_sync():
-    sync(part.pos, part.pos_smrt)
-    sync(part.vel, part.vel_smrt)
-    sync(part.pw_mask, part.pw_mask_smrt)
-    sync(part.pp_mask, part.pp_mask_smrt)
+    is_synced(part.pos, part.pos_smrt)
+    is_synced(part.vel, part.vel_smrt)
+    is_synced(part.pw_mask, part.pw_mask_smrt)
+    is_synced(part.pp_mask, part.pp_mask_smrt)
 
 def update_gpu(part):
     part.pos_smrt.mark_changed('host')
@@ -95,6 +93,7 @@ def update_gpu(part):
     
 def get_pp_col_time_gpu(part):
     global errors
+    check_gpu_sync()
     get_pp_col_time_kernel[pp_grid_shape, pp_block_shape](part.pp_dt_block_smrt, part.pos_smrt, part.vel_smrt, part.pp_mask_smrt, part.num, part.radius_gpu)#, part.pp_dt_full_gpu, part.pp_a_gpu, part.pp_b_gpu, part.pp_c_gpu)
 
 #     part.pp_dt_block_smrt.mark_changed('gpu')
