@@ -1,11 +1,9 @@
+### Core dynamical code for seriel mode
+
 import math
-import itertools as it
 import numpy as np
 np.set_printoptions(precision=2, suppress=True)
 from timeit import default_timer as timer
-import matplotlib
-import matplotlib.pyplot as plt
-import ipywidgets as widgets
 
 ### Global variables
 abs_tol = 1e-5
@@ -73,9 +71,7 @@ def initialize(wall, part):
 
     for (i, w) in enumerate(wall):
         w.idx = i
-        w.pw_gap_min = w.gap_m * part.radius + w.gap_b
-        w.get_mesh()
-
+        w.pw_gap_min = w.gap_m * part.radius + w.gap_b        
 
     part.mom_inert = part.mass * (part.gamma * part.radius)**2
     part.sigma_lin = np.sqrt(BOLTZ * part.temp / part.mass)
@@ -89,8 +85,8 @@ def initialize(wall, part):
             part.rand_pos(p)
         if np.any(np.isinf(part.vel[p])):
             part.rand_vel(p)
-#         if np.any(np.isinf(part.orient[p])):
-#             part.orient[p] = np.eye(part.dim)
+        if np.any(np.isinf(part.orient[p])):
+            part.orient[p] = np.eye(part.dim)
         if np.any(np.isinf(part.spin[p])):
             part.rand_spin(p)
 
@@ -114,7 +110,7 @@ class PW_CollisionLaw:
 class PW_SpecularLaw(PW_CollisionLaw):
     name = 'PW_SpecularLaw'
     def resolve_collision(self, wall, part, p):
-        nu = wall.normal(part.pos[p])
+        nu = wall.normal(part.pos_loc[p])
         part.vel[p] -= 2 * part.vel[p].dot(nu) * nu
         
 class PW_IgnoreLaw(PW_CollisionLaw):
@@ -135,10 +131,8 @@ class PW_PeriodicLaw(PW_CollisionLaw):
 
     def resolve_collision(self, wall, part, p):
         d = self.wrap_dim   # which dim will have sign flip
-#         s = np.sign(part.pos_loc[p, d]).astype(int)  # is it at + or -        
         part.pos_loc[p, d] *= -1   # flips sign of dim d
         part.pw_mask[:] = [p, self.wrap_wall]
-#         part.cell_offset[p, d] += s
 
 #No-slip law in any dimension from private correspondence with Cox and Feres.
 #See last pages of: https://github.com/drscook/unb_billiards/blob/master/references/no%20slip%20collisions/feres_N_dim_no_slip_law_2017.pdf
@@ -160,50 +154,73 @@ class PW_NoSlipLaw(PW_CollisionLaw):
         part.spin[p] = U_out
         part.vel[p] = v_out
 
+class PP_CollisionLaw:
+    @staticmethod
+    def resolve_collision(self, part, p1, p2):
+        raise Exception('You should implement the method resolve_collision() in a subclass.')
+
+class PP_IgnoreLaw(PP_CollisionLaw):
+    name = 'PP_IgnoreLaw'
+    def resolve_collision(self, part, p1, p2):
+        pass
+
+class PP_SpecularLaw(PP_CollisionLaw):
+    name = 'PP_SpecularLaw'        
+    def resolve_collision(self, part, p1, p2):
+        nu = part.pos[p2] - part.pos[p1]
+        nu = make_unit(nu)
+        m1 = part.mass[p1]
+        m2 = part.mass[p2]
+        M = m1 + m2
+
+        dv = part.vel[p2] - part.vel[p1]
+        w = dv.dot(nu) * nu
+        part.vel[p1] += 2 * (m2/M) * w
+        part.vel[p2] -= 2 * (m1/M) * w
+
+class PP_NoSlipLaw(PP_CollisionLaw):
+    name = 'PP_NoSlipLaw'
+    def resolve_collision(self, part, p1, p2):
+        nu = part.pos[p2] - part.pos[p1]
+        nu = make_unit(nu)
+        m1 = part.mass[p1]
+        m2 = part.mass[p2]
+        M = m1 + m2
         
+        r1 = part.radius[p1]
+        r2 = part.radius[p2]        
+        g1 = part.gamma[p1]
+        g2 = part.gamma[p2]
+        d = 2/((1/m1)*(1+1/g1**2) + (1/m2)*(1+1/g2**2))
+        
+        U1_in = part.spin[p1]
+        U2_in = part.spin[p2]
+        v1_in = part.vel[p1]
+        v2_in = part.vel[p2]
 
-# class PP_NoSlipLaw(PP_CollisionLaw):
-#     name = 'PP_NoSlipLaw'
-#     def resolve_collision(self, part, p1, p2):
-#         m1 = part.mass[p1]
-#         m2 = part.mass[p2]
-#         M = m1 + m2
-#         g1 = part.gamma[p1]
-#         g2 = part.gamma[p2]
-#         r1 = part.radius[p1]
-#         r2 = part.radius[p2]        
+        U1_out = (U1_in-d/(m1*g1**2) * Lambda_nu(U1_in, nu)) \
+                    + (-d/(m1*r1*g1**2)) * E_nu(v1_in, nu) \
+                    + (-r2/r1)*(d/(m1*g1**2)) * Lambda_nu(U2_in, nu) \
+                    + d/(m1*r1*g1**2) * E_nu(v2_in, nu)
 
-#         d = 2/((1/m1)*(1+1/g1**2) + (1/m2)*(1+1/g2**2))
-#         dx = part.pos_glob[p2] - part.pos_glob[p1]
-#         nu = make_unit(dx)
-#         U1_in = part.spin[p1]
-#         U2_in = part.spin[p2]
-#         v1_in = part.vel[p1]
-#         v2_in = part.vel[p2]
+        v1_out = (-r1*d/m1) * Gamma_nu(U1_in, nu) \
+                    + (v1_in - 2*m2/M * Pi_nu(v1_in, nu) - (d/m1) * Pi(v1_in, nu)) \
+                    + (-r2*d/m1) * Gamma_nu(U2_in, nu) \
+                    + (2*m2/M) * Pi_nu(v2_in, nu) + (d/m1) * Pi(v2_in, nu)
 
-#         U1_out = (U1_in-d/(m1*g1**2) * Lambda_nu(U1_in, nu)) \
-#                     + (-d/(m1*r1*g1**2)) * E_nu(v1_in, nu) \
-#                     + (-r2/r1)*(d/(m1*g1**2)) * Lambda_nu(U2_in, nu) \
-#                     + d/(m1*r1*g1**2) * E_nu(v2_in, nu)
+        U2_out = (-r1/r2)*(d/(m2*g2**2)) * Lambda_nu(U1_in, nu) \
+                    + (-d/(m2*r2*g2**2)) * E_nu(v1_in, nu) \
+                    + (U2_in - (d/(m2*g2**2)) * Lambda_nu(U2_in, nu)) \
+                    + (d/(m2*r2*g2**2)) * E_nu(v2_in, nu)
 
-#         v1_out = (-r1*d/m1) * Gamma_nu(U1_in, nu) \
-#                     + (v1_in - 2*m2/M * Pi_nu(v1_in, nu) - (d/m1) * Pi(v1_in, nu)) \
-#                     + (-r2*d/m1) * Gamma_nu(U2_in, nu) \
-#                     + (2*m2/M) * Pi_nu(v2_in, nu) + (d/m1) * Pi(v2_in, nu)
-
-#         U2_out = (-r1/r2)*(d/(m2*g2**2)) * Lambda_nu(U1_in, nu) \
-#                     + (-d/(m2*r2*g2**2)) * E_nu(v1_in, nu) \
-#                     + (U2_in - (d/(m2*g2**2)) * Lambda_nu(U2_in, nu)) \
-#                     + (d/(m2*r2*g2**2)) * E_nu(v2_in, nu)
-
-#         v2_out = (r1*d/m2) * Gamma_nu(U1_in, nu) \
-#                     + (2*m1/M) * Pi_nu(v1_in, nu) + (d/m2) * Pi(v1_in, nu) \
-#                     + (r2*d/m2) * Gamma_nu(U2_in, nu) \
-#                     + v2_in - (2*m1/M) * Pi_nu(v2_in, nu) - (d/m2) * Pi(v2_in,nu)
-#         part.spin[p1] = U1_out
-#         part.spin[p2] = U2_out
-#         part.vel[p1] = v1_out
-#         part.vel[p2] = v2_out   
+        v2_out = (r1*d/m2) * Gamma_nu(U1_in, nu) \
+                    + (2*m1/M) * Pi_nu(v1_in, nu) + (d/m2) * Pi(v1_in, nu) \
+                    + (r2*d/m2) * Gamma_nu(U2_in, nu) \
+                    + v2_in - (2*m1/M) * Pi_nu(v2_in, nu) - (d/m2) * Pi(v2_in,nu)
+        part.spin[p1] = U1_out
+        part.spin[p2] = U2_out
+        part.vel[p1] = v1_out
+        part.vel[p2] = v2_out   
 
 
 # master wall class; subclass for each wall shape
@@ -213,13 +230,13 @@ class Wall():
         self.gap_b = 0.0
         self.gap_m = 1.0
         self.temp = 1.0
-        self.pw_collision_law = PW_SpecularLaw()
+        self.collision_law = PW_SpecularLaw()
     
     def get_pw_gap(self, p=Ellipsis):        
         return self.get_pw_col_coefs(gap_only=True)
     
     def resolve_pw_collision(self, part, p):
-        self.pw_collision_law.resolve_collision(self, part, p)
+        self.collision_law.resolve_collision(self, part, p)
 
     @staticmethod
     def normal(pos):
@@ -236,7 +253,7 @@ class Wall():
 class FlatWall(Wall):
     def __init__(self, base_point, normal, tangents):
         super().__init__()
-        self.type = 'flat'        
+        self.name = 'flat'        
         self.base_point = np.asarray(base_point, dtype=np_dtype)
         self.normal_static = make_unit(normal)
         self.tangents = np.asarray(tangents, dtype=np_dtype)
@@ -258,12 +275,12 @@ class FlatWall(Wall):
         return a, b, c
     
     def get_mesh(self):
-        self.mesh = flat_mesh(self.base_point, self.tangents)
+        self.mesh = flat_mesh(self.tangents) + self.base_point  # see visualize.py
 
 class SphereWall(Wall):
     def __init__(self, base_point, radius):
         super().__init__()
-        self.type = 'sphere'        
+        self.name = 'sphere'        
         self.base_point = np.asarray(base_point, dtype=np_dtype)
         self.radius = radius
         self.gap_b = radius
@@ -284,7 +301,7 @@ class SphereWall(Wall):
         return a, b, c
 
     def get_mesh(self):
-        self.mesh = sphere_mesh(self.base_point, self.radius, self.dim)
+        self.mesh = sphere_mesh(self.dim, self.radius) + self.base_point # see visualize.py
 
 class Particles():
     def __init__(self):
@@ -301,7 +318,7 @@ class Particles():
         self.vel = np.full([self.num, self.dim], np.inf, dtype=np_dtype)
         
         self.dim_spin = int(self.dim * (self.dim - 1) / 2)
-#         self.orient = np.full([self.num, self.dim, self.dim], np.inf, dtype=np_dtype)
+        self.orient = np.full([self.num, self.dim, self.dim], np.inf, dtype=np_dtype)
         self.spin = np.full([self.num, self.dim, self.dim], np.inf, dtype=np_dtype)
 
         self.t = 0.0
@@ -311,18 +328,30 @@ class Particles():
         self.pp_mask = self.default_mask.copy()
         self.pw_mask = self.default_mask.copy()
         
+        self.collision_law = PP_SpecularLaw()
+        
         self.t_hist = []
         self.pos_hist = []
         self.vel_hist = []
 #         self.orient_hist = []
         self.spin_hist = []
-        self.col_hist = []        
+        self.col_hist = []
+
+    def get_mesh(self):
+        S = sphere_mesh(self.dim, 1.0)
+        if self.dim == 2:
+            S = np.vstack([S, [-1,0]])
+
+        part.mesh = []
+        for p in range(part.num):
+            self.mesh.append(S*self.radius[p]) # see visualize.py
+        part.mesh = np.asarray(part.mesh)
+            
         # pretty color for visualization
         cm = plt.cm.gist_rainbow
         idx = np.linspace(0, cm.N-1 , self.num).round().astype(int)
         self.clr = [cm(i) for i in idx]
-
-
+        
     def get_pp_col_coefs(self, gap_only=False):
         dx = cross_subtract(part.pos)
         c = np.einsum('pqd, pqd -> pq', dx, dx)
@@ -385,15 +414,7 @@ class Particles():
         return a, b, c
     
     def resolve_pp_collision(self, p1, p2):
-        m1 = part.mass[p1]
-        m2 = part.mass[p2]
-        M = m1 + m2
-        nu = part.pos[p2] - part.pos[p1]
-        nu = make_unit(nu)
-        dv = part.vel[p2] - part.vel[p1]
-        w = dv.dot(nu) * nu
-        part.vel[p1] += 2 * (m2/M) * w
-        part.vel[p2] -= 2 * (m1/M) * w
+        self.collision_law.resolve_collision(self, p1, p2)
 
     def get_KE(self):
         self.KE_lin = self.mass * contract(self.vel**2)
@@ -433,6 +454,8 @@ class Particles():
         part.vel_hist = np.asarray(part.vel_hist)
 #         part.orient_hist = np.asarray(part.orient_hist)
         part.spin_hist = np.asarray(part.spin_hist)
+        part.num_steps = len(part.t_hist)
+        part.num_frames = part.num_steps
 
 def solve_quadratic(a, b, c, mask=[]):
     # The hard task is finding the first root.  Because the sum and product of the two roots must equal
@@ -483,29 +506,6 @@ def solve_quadratic(a, b, c, mask=[]):
 
 ### Helper functions
 
-def flat_mesh(base_point, tangents):
-    pts = 100
-    N, D = tangents.shape
-    grid = [np.linspace(-1, 1, pts) for n in range(N)]
-    grid = np.meshgrid(*grid)
-    grid = np.asarray(grid)
-    mesh = grid.T.dot(tangents) + base_point    
-    return mesh
-
-def sphere_mesh(base_point, radius, dim):
-    pts = 100
-    grid = [np.linspace(0, np.pi, pts) for d in range(dim-1)]
-    grid[-1] *= 2
-    grid = np.meshgrid(*grid)                           
-    mesh = []
-    for d in range(dim):
-        w = radius * np.ones_like(grid[0])
-        for j in range(d):
-            w *= np.sin(grid[j])
-        if d < dim-1:
-            w *= np.cos(grid[d])
-        mesh.append(w)
-    return np.asarray(mesh).T + base_point
 
 
 #######################################################################################################

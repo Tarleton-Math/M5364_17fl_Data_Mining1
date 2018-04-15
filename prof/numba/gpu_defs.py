@@ -1,3 +1,5 @@
+### Code for parallel mode on GPU using numba cuda
+
 import math
 import numba as nb
 import numba.cuda as cuda
