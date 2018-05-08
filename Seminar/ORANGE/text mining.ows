@@ -1,0 +1,46 @@
+<?xml version='1.0' encoding='utf-8'?>
+<scheme description="" title="text mining" version="2.0">
+	<nodes>
+		<node id="0" name="Word Cloud" position="(302.0, 256.0)" project_name="Orange3-Text" qualified_name="orangecontrib.text.widgets.owwordcloud.OWWordCloud" title="Word Cloud" version="" />
+		<node id="1" name="Bag of Words" position="(243.0, 363.0)" project_name="Orange3-Text" qualified_name="orangecontrib.text.widgets.owbagofwords.OWTBagOfWords" title="Bag of Words" version="" />
+		<node id="2" name="Corpus" position="(92.0, 247.0)" project_name="Orange3-Text" qualified_name="orangecontrib.text.widgets.owcorpus.OWCorpus" title="Corpus" version="" />
+	</nodes>
+	<links>
+		<link enabled="true" id="0" sink_channel="Corpus" sink_node_id="0" source_channel="Corpus" source_node_id="2" />
+	</links>
+	<annotations />
+	<thumbnail />
+	<node_properties>
+		<properties format="pickle" node_id="0">gAN9cQAoWBIAAABjb250cm9sQXJlYVZpc2libGVxAYhYEwAAAHNhdmVkV2lkZ2V0R2VvbWV0cnlx
+AkMyAdnQywACAAD///wxAAABa////4AAAAOg///8OQAAAYr///94AAADmAAAAAEAAAAABQBxA1gO
+AAAAc2VsZWN0ZWRfd29yZHNxBGNidWlsdGlucwpzZXQKcQVdcQaFcQdScQhYCwAAAHdvcmRzX2Nv
+bG9ycQmIWAoAAAB3b3Jkc190aWx0cQpLAFgLAAAAX192ZXJzaW9uX19xC0sBdS4=
+</properties>
+		<properties format="literal" node_id="1">{'autocommit': True, 'controlAreaVisible': True, 'normalization': 'L1 (Sum of elements)', 'savedWidgetGeometry': b'\x01\xd9\xd0\xcb\x00\x02\x00\x00\xff\xff\xfc\xed\x00\x00\x01t\xff\xff\xfe\x13\x00\x00\x02L\xff\xff\xfc\xf5\x00\x00\x01\x93\xff\xff\xfe\x0b\x00\x00\x02D\x00\x00\x00\x01\x00\x00\x00\x00\x05\x00', 'wglobal': 'IDF', 'wlocal': 'Count', '__version__': 1}</properties>
+		<properties format="pickle" node_id="2">gAN9cQAoWBIAAABjb250cm9sQXJlYVZpc2libGVxAYhYDAAAAHJlY2VudF9maWxlc3ECXXEDKFgY
+AAAAZ3JpbW0tdGFsZXMtc2VsZWN0ZWQudGFicQRYIwAAAEM6L1VzZXJzLzAwMDg4MTkxNi9EZXNr
+dG9wL25ldWUuY3N2cQVYEQAAAGJvb2stZXhjZXJwdHMudGFicQZYGAAAAGVsZWN0aW9uLXR3ZWV0
+cy0yMDE2LnRhYnEHWBcAAABmcmllbmRzLXRyYW5zY3JpcHRzLnRhYnEIWAwAAABhbmRlcnNlbi50
+YWJxCWVYEwAAAHNhdmVkV2lkZ2V0R2VvbWV0cnlxCkMyAdnQywACAAD///xeAAAA/f///qEAAALE
+///8ZgAAARz///6ZAAACvAAAAAEAAAAABQBxC1gLAAAAX192ZXJzaW9uX19xDEsBWBAAAABjb250
+ZXh0X3NldHRpbmdzcQ1dcQ5jT3JhbmdlLndpZGdldHMuc2V0dGluZ3MKQ29udGV4dApxDymBcRB9
+cREoWAQAAAB0aW1lcRJHQda4htF7vMBYBgAAAHZhbHVlc3ETfXEUKFgKAAAAdXNlZF9hdHRyc3EV
+XXEWY09yYW5nZS5kYXRhLnZhcmlhYmxlCm1ha2VfdmFyaWFibGUKcRdjT3JhbmdlLmRhdGEudmFy
+aWFibGUKU3RyaW5nVmFyaWFibGUKcRhOWAcAAABDb250ZW50cRmHcRpScRt9cRwoWAQAAABuYW1l
+cR1oGVgOAAAAX2NvbXB1dGVfdmFsdWVxHk5YCwAAAHVua25vd25fc3RycR9jYnVpbHRpbnMKc2V0
+CnEgXXEhKEd/+AAAAAAAAFgAAAAAcSJYAQAAAD9xI05YAwAAAG5hbnEkWAIAAABOQXElWAEAAAB+
+cSZYAQAAAC5xJ2WFcShScSlYDwAAAHNvdXJjZV92YXJpYWJsZXEqTlgGAAAAc3BhcnNlcSuJWAoA
+AABhdHRyaWJ1dGVzcSx9cS1YBwAAAGluY2x1ZGVxLlgEAAAAVHJ1ZXEvc1gHAAAAX2NvbG9yc3Ew
+TnViYWgMSwF1aCwpWAUAAABtZXRhc3ExKFgFAAAAVGl0bGVxMksDhnEzWAgAAABBYnN0cmFjdHE0
+SwOGcTVoGUsDhnE2WA0AAABBVFUgTnVtZXJpY2FscTdLA4ZxOFgIAAAAQVRVIFR5cGVxOV1xOihY
+EAAAAERvbWVzdGljIEFuaW1hbHNxO1gZAAAAT3RoZXIgQW5pbWFscyBhbmQgT2JqZWN0c3E8WB8A
+AABPdGhlciBUYWxlcyBvZiB0aGUgU3VwZXJuYXR1cmFscT1YGAAAAFN1cGVybmF0dXJhbCBBZHZl
+cnNhcmllc3E+WBQAAABTdXBlcm5hdHVyYWwgSGVscGVyc3E/WCAAAABTdXBlcm5hdHVyYWwgUG93
+ZXJzIG9yIEtub3dsZWRnZXFAWBIAAABTdXBlcm5hdHVyYWwgVGFza3NxQVgjAAAAU3VwZXJuYXR1
+cmFsIG9yIEVuY2hhbnRlZCBSZWxhdGl2ZXNxQlggAAAAV2lsZCBBbmltYWwgYW5kIERvbWVzdGlj
+IEFuaW1hbHNxQ1gMAAAAV2lsZCBBbmltYWxzcURYFwAAAFdpbGQgQW5pbWFscyBhbmQgSHVtYW5z
+cUVlhnFGdHFHWAoAAABjbGFzc192YXJzcUhYCQAAAEFUVSBUb3BpY3FJXXFKKFgMAAAAQW5pbWFs
+IFRhbGVzcUtYDgAAAFRhbGVzIG9mIE1hZ2ljcUxlhnFNhXFOdWJhdS4=
+</properties>
+	</node_properties>
+</scheme>
